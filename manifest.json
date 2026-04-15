@@ -1,12 +1,11 @@
 {
+  "manifest_version": 3,
   "version": "1.3.6",
-  "manifest_version": 2,
   "name": "__MSG_appName__",
   "short_name": "__MSG_appShortName__",
   "description": "__MSG_appDesc__",
   "author": "Mahmood Moghimi, m.moghimi[at]modares.ac.ir",
   "homepage_url": "https://moghimi.net/works/PhishDetector",
-  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "default_locale": "en",
   "icons": {
     "128": "img/icon128.png",
@@ -14,14 +13,15 @@
     "32": "img/icon32.png",
     "96": "img/icon96.png"
   },
-  "offline_enabled": false,
-  "background": {
-    "scripts": ["js/background.js"]
-  },
-  "browser_action": {
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "action": {
     "default_icon": "img/icon38.png",
     "default_popup": "html/popup.html",
     "default_title": "Phishing Detector"
+  },
+  "background": {
+    "service_worker": "js/background.js"
   },
   "content_scripts": [
     {
@@ -29,5 +29,8 @@
       "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_start"
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'"
+  }
 }

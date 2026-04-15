@@ -188,7 +188,7 @@ var gr = function (resources, source, domain) {
 		resourceDistance = resourceDistance / count;
 		https /= count;
 	}
-	if (resourceDistance === null || resourceDistance === NaN)
+	if (resourceDistance === null || isNaN(resourceDistance))
 		resourceDistance = 0;
 	resourceDistance = resourceDistance > 1 ? 1 : resourceDistance;
 	var possibleTarget = targetList[0];
@@ -252,7 +252,7 @@ var gc = function (str) {
 // Check for keywords in directory part of a URL
 // ==============================================================================================
 var dk = function (dir) {
-	keywords = ['wp', 'paypal', 'content', 'com', 'images', 'includes', 'www', 'admin', 'update',
+	var keywords = ['wp', 'paypal', 'content', 'com', 'images', 'includes', 'www', 'admin', 'update',
 		'js', 'amp', 'security', 'remax', 'fr', 'cmd', 'templates', 'uploads', 'css',
 		'cache', 'dispatch', 'modules', 'de', 'components'];
 
