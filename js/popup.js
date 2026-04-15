@@ -21,25 +21,43 @@ window.onload = function () {
 			}
 		}
 
-		function showResult(response) {
-			var data = { Result: 'Unknown', Confidence: 0, Rule: 0 };
-			var result = "";
-			var resultEl = document.getElementById("result");
-			if (typeof response == 'undefined' || response == null) {
-				resultEl.classList.remove('loading');
-				resultEl.classList.add("Unknown");
-				resultEl.innerHTML = "Could not inspect this page. Try navigating to an http/https webpage.";
-				return;
-			}
+function showResult(response) {
+    var data = { Result: 'Unknown', Confidence: 0, Rule: 0 };
+    var result = "";
+    var resultEl = document.getElementById("result");
+    if (typeof response == 'undefined' || response == null) {
+        resultEl.classList.remove('loading');
+        resultEl.classList.add("Unknown");
+        resultEl.innerHTML = "Could not inspect this page.";
+        return;
+    }
 
-			var Domain = response.Domain;
-			console.log(response);
-			var _f2 = response.F2,
-				_f4 = response.F4,
-				_f8 = response.F8,
-				_f13 = response.F13,
-				_f16 = response.F16,
-				_f17 = response.F17;
+    var Domain = response.Domain;
+    var _f2 = response.F2,
+        _f4 = response.F4,
+        _f8 = response.F8,
+        _f13 = response.F13,
+        _f16 = response.F16,
+        _f17 = response.F17;
+
+    // ADD THIS -- log all extracted features clearly
+    console.log("=== PhishDetector Feature Dump ===");
+    console.log("Domain:", Domain);
+    console.log("F2  - Uses HTTPS? (1=yes, 0=no):", _f2);
+    console.log("F4  - Host length score (higher = shorter domain):", _f4);
+    console.log("F8  - Suspicious keywords in URL path:", _f8);
+    console.log("F13 - Link domain distance from page domain:", _f13);
+    console.log("F16 - Image domain distance from page domain:", _f16);
+    console.log("F17 - Fraction of links using HTTPS:", _f17);
+    console.log("==================================");
+
+    // ... all the if statements run here ...
+
+    // ADD THIS -- log the final verdict and which rule fired
+    console.log("=== PhishDetector Verdict ===");
+    console.log("Result:", data.Result);
+    console.log("Rule that fired:", data.Rule);
+    console.log("=============================");
 
 			if (_f2 == 1 && _f16 > 0.588 && _f13 > 0.315) {
 				data.Result = "Phishing"; data.Confidence = "1"; data.Rule = "1";
