@@ -305,25 +305,75 @@ var f2 = 0, f4 = -1, f5 = -1, f8 = -1, f13 = 0, f16 = 0, f17 = 0;
 chrome.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
 		if (request.type == "getFeatures") {
+			
+			// ========== STEP 1: Parse the current page URL ==========
 			var uri = pu(document.URL);
+			console.log("=== STEP 1: Raw URL Parsing ===");
+			console.log("Full URL:", document.URL);
+			console.log("Parsed URI object:", uri);
+			console.log("  - protocol:", uri.protocol);
+			console.log("  - host:", uri.host);
+			console.log("  - directory:", uri.directory);
+			console.log("  - file:", uri.file);
+			console.log("  - query:", uri.query);
+			
+			// ========== STEP 2: Check HTTPS ==========
 			if (uri.protocol === "https")
 				f2 = 1;
+			console.log("=== STEP 2: HTTPS Check ===");
+			console.log("  f2 (is HTTPS?):", f2);
+			
+			// ========== STEP 3: Calculate host/directory length scores ==========
 			if (uri.host.length > 0)
 				f4 = ro(1 / uri.host.length, 4);
 			if (uri.directory.length > 0)
 				f5 = ro(1 / uri.directory.length, 4);
+			console.log("=== STEP 3: Length Scores ===");
+			console.log("  Host length:", uri.host.length, "-> f4 score:", f4);
+			console.log("  Directory length:", uri.directory.length, "-> f5 score:", f5);
 
+			// ========== STEP 4: Extract URL keywords ==========
 			var d = gk(uri.host, uri.directory, uri.file, uri.query);
+			console.log("=== STEP 4: URL Keywords ===");
+			console.log("  Keywords extracted:", d);
+			
+			// ========== STEP 5: Check for suspicious keywords in directory ==========
 			f8 = gc(uri.directory) > 0 ? dk(uri.directory) / gc(uri.directory) : -1;
+			console.log("=== STEP 5: Suspicious Keywords ===");
+			console.log("  Directory word count:", gc(uri.directory));
+			console.log("  Suspicious keyword ratio (f8):", f8);
 
+			// ========== STEP 6: Analyze ALL LINKS on the page ==========
+			console.log("=== STEP 6: Raw Link Data ===");
+			console.log("  Total links found:", document.links.length);
+			console.log("  First 5 links (raw):");
+			for (var i = 0; i < Math.min(5, document.links.length); i++) {
+				console.log("    [" + i + "]", document.links[i].href);
+			}
+			
 			var v;
 			v = gr(document.links, uri.source, uri.protocol + "://" + uri.host + "/");
 			f13 = ro(v[0], 4);
 			f17 = ro(v[1], 4);
+			console.log("  Link distance score (f13):", f13);
+			console.log("  Link HTTPS ratio (f17):", f17);
 
+			// ========== STEP 7: Analyze ALL IMAGES on the page ==========
+			console.log("=== STEP 7: Raw Image Data ===");
+			console.log("  Total images found:", document.images.length);
+			console.log("  First 5 images (raw):");
+			for (var i = 0; i < Math.min(5, document.images.length); i++) {
+				console.log("    [" + i + "]", document.images[i].src);
+			}
+			
 			v = gr(document.images, uri.source, uri.protocol + "://" + uri.host + "/");
 			f16 = ro(v[0], 4);
+			console.log("  Image distance score (f16):", f16);
 
+			// ========== FINAL: Send all features back ==========
+			console.log("=== FINAL FEATURE VECTOR ===");
+			console.log({ URL: document.URL, Domain: uri.host, F2: f2, F4: f4, F5: f5, F8: f8, F13: f13, F16: f16, F17: f17 });
+			
 			sendResponse({ URL: document.URL, Domain: uri.host, F2: f2, F4: f4, F5: f5, F8: f8, F13: f13, F16: f16, F17: f17 });
 		}
 	}
